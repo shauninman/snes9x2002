@@ -145,6 +145,11 @@ static INLINE void AbsoluteLong()
 {
 #ifdef FAST_LSB_WORD_ACCESS
    OpAddress = (*(uint32*) CPU.PC) & 0xffffff;
+#elsif FAST_ALIGNED_LSB_WORD_ACCESS
+   if (((int32_t) CPU.PC & 1) == 0)
+		OpAddress = (*(uint16_t*) CPU.PC) + (CPU.PC[2] << 16);
+	else
+		OpAddress = *CPU.PC + ((*(uint16_t*) (CPU.PC + 1)) << 8);
 #else
    OpAddress = *CPU.PC + (*(CPU.PC + 1) << 8) + (*(CPU.PC + 2) << 16);
 #endif
@@ -272,6 +277,11 @@ static INLINE void AbsoluteLongIndexedX()
 {
 #ifdef FAST_LSB_WORD_ACCESS
    OpAddress = (*(uint32*) CPU.PC + Registers.X.W) & 0xffffff;
+#elsif FAST_ALIGNED_LSB_WORD_ACCESS
+   if (((int32_t) CPU.PC & 1) == 0)
+		OpAddress = ((*(uint16_t*) CPU.PC) + (CPU.PC[2] << 16) + reg->X.W) & 0xFFFFFF;
+	else
+		OpAddress = (*CPU.PC + ((*(uint16_t*) (CPU.PC + 1)) << 8) + reg->X.W) & 0xFFFFFF;
 #else
    OpAddress = (*CPU.PC + (*(CPU.PC + 1) << 8) + (*(CPU.PC + 2) << 16) + Registers.X.W) & 0xffffff;
 #endif
