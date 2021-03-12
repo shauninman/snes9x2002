@@ -270,6 +270,7 @@ void init_sfc_setting(void)
 #endif
    Settings.SpeedHacks = true;
    Settings.HBlankStart = (256 * Settings.H_Max) / SNES_HCOUNTER_MAX;
+   Settings.DisplayFrameRate = false;
 }
 
 void Init_SFC(void)

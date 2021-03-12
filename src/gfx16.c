@@ -661,6 +661,9 @@ void S9xEndScreenRefresh()
       IPPU.ColorsChanged = FALSE;
       //}
 
+      if (Settings.DisplayFrameRate)
+         S9xDisplayFrameRate();
+
       S9xDeinitUpdate(IPPU.RenderedScreenWidth, IPPU.RenderedScreenHeight,
                       1);
    }
@@ -2529,6 +2532,19 @@ void DisplayChar(uint8* Screen, uint8 c)
             *s = BLACK;
       }
    }
+}
+
+void S9xDisplayFrameRate()
+{
+	char string[16];
+   uint8 *Screen = GFX.Screen;
+
+	sprintf(string, "%02d/%02d", IPPU.DisplayedRenderedFrameCount, (int)Memory.ROMFramesPerSecond);
+
+	for (int i = 0; i < 5; i++) {
+		DisplayChar(Screen, string[i]);
+		Screen += (font_width - 1) * sizeof(uint16);
+	}
 }
 
 static void S9xUpdateScreenTransparency()  // ~30-50ms! (called from FLUSH_REDRAW())
