@@ -1,7 +1,7 @@
 /*	.DATA*/
    .text
 	.align	4
-	.include	"os9x_65c816_common.s"
+	.include	"os9x_65c816_common.S"
 
 .globl asmS9xGetByte
 .globl asmS9xGetWord

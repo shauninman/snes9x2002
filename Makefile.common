@@ -25,8 +25,7 @@ SOURCES := 	$(CORE_DIR)/apu.c \
 				$(CORE_DIR)/snapshot.c \
 				$(CORE_DIR)/soundux.c \
 				$(CORE_DIR)/spc700.c \
-				$(CORE_DIR)/srtc.c \
-				$(LIBRETRO_DIR)/libretro.c
+				$(CORE_DIR)/srtc.c
 
 ifeq ($(STATIC_LINKING), 1)
 else

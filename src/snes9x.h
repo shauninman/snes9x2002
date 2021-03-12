@@ -49,13 +49,19 @@
 
 #define ROM_NAME_LEN 23
 
-#include <streams/memory_stream.h>
-#define STREAM memstream_t *
-#define READ_STREAM(p, l, s)     memstream_read(s, p, l)
-#define WRITE_STREAM(p, l, s)    memstream_write(s, p, l)
-#define OPEN_STREAM(f, m)        memstream_open(0)
-#define CLOSE_STREAM(s)          memstream_close(s)
-#define SEEK_STREAM(p,r,s)       memstream_seek(p,r,s)
+/* #include <streams/memory_stream.h> */
+/* #define STREAM memstream_t * */
+/* #define READ_STREAM(p, l, s)     memstream_read(s, p, l) */
+/* #define WRITE_STREAM(p, l, s)    memstream_write(s, p, l) */
+/* #define OPEN_STREAM(f, m)        memstream_open(0) */
+/* #define CLOSE_STREAM(s)          memstream_close(s) */
+/* #define SEEK_STREAM(p,r,s)       memstream_seek(p,r,s) */
+
+#define STREAM FILE *
+#define READ_STREAM(p, l, s)     fread(p, sizeof(char), l, s)
+#define WRITE_STREAM(p, l, s)    fwrite(p, sizeof(char), l, s)
+#define OPEN_STREAM(f, m)        fopen(f, m)
+#define CLOSE_STREAM(s)          fclose(s)
 
 /* SNES screen width and height */
 #define SNES_WIDTH      256
@@ -92,12 +98,12 @@
 // 1 / PPU clock * 342 -> 64.281us
 // 64.281us / (1 / 3.546895MHz) -> 228 cycles per scanline.
 
-//#define SNES_SCANLINE_TIME (63.695e-6)
-//#define SNES_CLOCK_SPEED (3579545)
+#define SNES_SCANLINE_TIME (63.695e-6)
+#define SNES_CLOCK_SPEED (3579545)
 
-//#define SNES_CLOCK_LEN (1.0 / SNES_CLOCK_SPEED)
+#define SNES_CLOCK_LEN (1.0 / SNES_CLOCK_SPEED)
 
-//#define SNES_APUTIMER2_CYCLEx10000 ((uint32) 3355824)
+#define SNES_APUTIMER2_CYCLEx10000 ((uint32) 3355824)
 
 #ifdef VAR_CYCLES
 //#define SNES_CYCLES_PER_SCANLINE ((uint32) ((SNES_SCANLINE_TIME / SNES_CLOCK_LEN) * 6 + 0.5))

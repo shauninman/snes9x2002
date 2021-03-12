@@ -3,7 +3,7 @@
 /****************************************************************	
 ****************************************************************/
 	.align 4
-	.include	"os9x_65c816_common.s"
+	.include	"os9x_65c816_common.S"
 
 .equ	IAPU_PC_offs, 	52
 
@@ -93,7 +93,7 @@
 .endm
 */
 		
-		.include	"os9x_65c816_opcodes.s"
+		.include	"os9x_65c816_opcodes.S"
 
 
 /*

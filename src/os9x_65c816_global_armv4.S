@@ -3,4 +3,4 @@
 	mov	pc, \reg 	
 .endm
 
-.include "os9x_65c816_global.s"
+.include "os9x_65c816_global.S"
