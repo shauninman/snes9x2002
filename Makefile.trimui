@@ -6,7 +6,7 @@ VIDEO_BACKEND = sdl
 INPUT_BACKEND = sdl
 SOUND_BACKEND = sdl
 
-PREFIX  = arm-buildroot-linux-gnueabi
+PREFIX  = /opt/trimui-toolchain/bin/arm-buildroot-linux-gnueabi
 
 # define regarding OS, which compiler to use
 CC	= $(PREFIX)-gcc
