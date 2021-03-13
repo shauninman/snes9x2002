@@ -39,7 +39,10 @@ static const int8_t upscalers_available = 2
 #endif
 ;
 
-static void SaveState_Menu(uint_fast8_t load_mode, uint_fast8_t slot)
+void SaveState_PathTemplate(char* tmp, int size) {
+	snprintf(tmp, size, "%s/%s_%%i.sts", save_path, GameName_emu);
+}
+void SaveState_Menu(uint_fast8_t load_mode, uint_fast8_t slot)
 {
 	char tmp[512];
 	snprintf(tmp, sizeof(tmp), "%s/%s_%d.sts", save_path, GameName_emu, slot);

@@ -32,6 +32,12 @@
 #include "input.h"
 #include "sound_output.h"
 
+#include <dlfcn.h>
+#include <mmenu.h>
+static void* mmenu = NULL;
+static char rom_path[512];
+static char save_path[512];
+
 char GameName_emu[512];
 
 bool overclock_cycles = false;
@@ -337,6 +343,10 @@ int main(int argc, char* argv[])
 	
 	Init_Configuration();
 	
+	mmenu = dlopen("libmmenu.so", RTLD_LAZY);
+	strcpy(rom_path, argv[1]);
+	SaveState_PathTemplate(save_path, 512);
+	
     // get the game ready
     while (!exit_snes)
     {
@@ -346,7 +356,30 @@ int main(int argc, char* argv[])
 				Emulation_Run();
 			break;
 			case 1:
-				Menu();
+				if (mmenu) {
+					ShowMenu_t ShowMenu = (ShowMenu_t)dlsym(mmenu, "ShowMenu");
+					MenuReturnStatus status = ShowMenu(rom_path, save_path, sdl_screen, kMenuEventKeyDown);
+
+					if (status==kStatusExitGame) {
+						exit_snes = 1;
+					}
+					else if (status==kStatusOpenMenu) {
+						Menu();
+					}
+					else if (status>=kStatusLoadSlot) {
+						int slot = status - kStatusLoadSlot;
+						SaveState_Menu(1, slot);
+					}
+					else if (status>=kStatusSaveSlot) {
+						int slot = status - kStatusSaveSlot;
+						SaveState_Menu(0, slot);
+					}
+					emulator_state = 0;
+					SDL_FillRect(sdl_screen, NULL, 0);
+				}
+				else {
+					Menu();
+				}
 			break;
 		}
     }

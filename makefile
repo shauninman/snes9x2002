@@ -1,6 +1,6 @@
 GIT_VERSION := "$(shell git describe --abbrev=7 --dirty --always)"
 
-PRGNAME = snes9x
+PRGNAME = snes9x2002
 
 VIDEO_BACKEND = sdl
 INPUT_BACKEND = sdl
@@ -36,7 +36,8 @@ else ifeq ($(PROFILE), APPLY)
 CFLAGS	+= -fprofile-use -fprofile-dir=./profile -fbranch-probabilities
 endif
 
-LDFLAGS = -lc -lgcc -lm $(SDL_LIBS) -no-pie -Wl,--as-needed -Wl,--gc-sections -s -flto
+LDFLAGS = -lc -lgcc -lm $(SDL_LIBS) -no-pie -Wl,--gc-sections -s -flto
+LDFLAGS += -lSDL_image -lSDL_ttf -ldl
 ifeq ($(SOUND_BACKEND), portaudio)
 LDFLAGS	+= -lasound -lportaudio
 endif
