@@ -22,11 +22,7 @@ uint8_t *keystate;
 uint8_t exit_snes = 0;
 extern uint32_t emulator_state;
 
-#define CASE(realkey, key) \
-	if (keystate[realkey]) \
-		joypad |= key; \
-	else \
-		joypad &= ~key; \
+static uint32_t joypad = 0;
 
 uint32_t S9xReadJoypad(int32_t port)
 {
@@ -46,9 +42,6 @@ uint32_t S9xReadJoypad(int32_t port)
 		SNES_TL_MASK,
 		SNES_TR_MASK
 	};
-
-	int32_t i;
-	uint32_t joypad = 0;
 
 	// Only 1P is supported
 	if (port > 0) return joypad;
