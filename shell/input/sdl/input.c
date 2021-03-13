@@ -53,48 +53,77 @@ uint32_t S9xReadJoypad(int32_t port)
 	// Only 1P is supported
 	if (port > 0) return joypad;
 
-	keystate = SDL_GetKeyState(NULL);
-
 	while (SDL_PollEvent(&event))
 	{
 		switch (event.type)
 		{
-			case SDL_KEYDOWN:
-				switch(event.key.keysym.sym)
-				{
-					case BTN_MENU:
-					case BTN_L2:
-						emulator_state = 1;
-					break;
-				  default:
-					break;
-				}
-			break;
-			case SDL_KEYUP:
-				switch(event.key.keysym.sym)
-				{
-					case BTN_HOME:
-						emulator_state = 1;
-					break;
-				  default:
-					break;
-				}
-			break;
+			case SDL_KEYDOWN: {
+				SDLKey key = event.key.keysym.sym;
+				
+				if (key==BTN_MENU) 
+					emulator_state = 1;
+				
+				if (key==option.config_buttons[0][0])
+					joypad |= SNES_UP_MASK;
+				if (key==option.config_buttons[0][1])
+					joypad |= SNES_RIGHT_MASK;
+				if (key==option.config_buttons[0][2])
+					joypad |= SNES_DOWN_MASK;
+				if (key==option.config_buttons[0][3])
+					joypad |= SNES_LEFT_MASK;
+				
+				if (key==option.config_buttons[0][4])
+					joypad |= SNES_A_MASK;
+				if (key==option.config_buttons[0][5])
+					joypad |= SNES_B_MASK;
+				if (key==option.config_buttons[0][6])
+					joypad |= SNES_X_MASK;
+				if (key==option.config_buttons[0][7])
+					joypad |= SNES_Y_MASK;
+				if (key==option.config_buttons[0][8])
+					joypad |= SNES_TL_MASK;
+				if (key==option.config_buttons[0][9])
+					joypad |= SNES_TR_MASK;
+				
+				if (key==option.config_buttons[0][10])
+					joypad |= SNES_START_MASK;
+				if (key==option.config_buttons[0][11])
+					joypad |= SNES_SELECT_MASK;
+			} break;
+				
+			
+			case SDL_KEYUP: {
+				SDLKey key = event.key.keysym.sym;
+				
+				if (key==option.config_buttons[0][0])
+					joypad &= ~SNES_UP_MASK;
+				if (key==option.config_buttons[0][1])
+					joypad &= ~SNES_RIGHT_MASK;
+				if (key==option.config_buttons[0][2])
+					joypad &= ~SNES_DOWN_MASK;
+				if (key==option.config_buttons[0][3])
+					joypad &= ~SNES_LEFT_MASK;
+				
+				if (key==option.config_buttons[0][4])
+					joypad &= ~SNES_A_MASK;
+				if (key==option.config_buttons[0][5])
+					joypad &= ~SNES_B_MASK;
+				if (key==option.config_buttons[0][6])
+					joypad &= ~SNES_X_MASK;
+				if (key==option.config_buttons[0][7])
+					joypad &= ~SNES_Y_MASK;
+				if (key==option.config_buttons[0][8])
+					joypad &= ~SNES_TL_MASK;
+				if (key==option.config_buttons[0][9])
+					joypad &= ~SNES_TR_MASK;
+				
+				if (key==option.config_buttons[0][10])
+					joypad &= ~SNES_START_MASK;
+				if (key==option.config_buttons[0][11])
+					joypad &= ~SNES_SELECT_MASK;
+			} break;
 		}
 	}
-
-	CASE(option.config_buttons[0][10], SNES_START_MASK);
-	CASE(option.config_buttons[0][11], SNES_SELECT_MASK);
-	CASE(option.config_buttons[0][4], SNES_A_MASK);
-	CASE(option.config_buttons[0][5], SNES_B_MASK);
-	CASE(option.config_buttons[0][6], SNES_X_MASK);
-	CASE(option.config_buttons[0][7], SNES_Y_MASK);
-	CASE(option.config_buttons[0][8], SNES_TL_MASK);
-	CASE(option.config_buttons[0][9], SNES_TR_MASK);
-	CASE(option.config_buttons[0][0], SNES_UP_MASK);
-	CASE(option.config_buttons[0][1], SNES_RIGHT_MASK);
-	CASE(option.config_buttons[0][2], SNES_DOWN_MASK);
-	CASE(option.config_buttons[0][3], SNES_LEFT_MASK);
 
 	return joypad;
 }
