@@ -355,7 +355,7 @@ void Menu()
 
         SDL_FillRect( backbuffer, NULL, 0 );
 
-		print_string("SNESEmu - Built on " __DATE__, TextWhite, 0, 5, 15, backbuffer->pixels);
+		print_string("snes9x2002 - Built on " __DATE__, TextWhite, 0, 5, 15, backbuffer->pixels);
 
 		if (currentselection == 1) print_string("Continue", TextRed, 0, 5, 45, backbuffer->pixels);
 		else  print_string("Continue", TextWhite, 0, 5, 45, backbuffer->pixels);
