@@ -26,6 +26,8 @@ static uint32_t joypad = 0;
 
 uint32_t S9xReadJoypad(int32_t port)
 {
+	if (port!=0) return 0;
+	
 	SDL_Event event;
 	static const uint32_t snes_lut[] =
 	{
@@ -42,9 +44,6 @@ uint32_t S9xReadJoypad(int32_t port)
 		SNES_TL_MASK,
 		SNES_TR_MASK
 	};
-
-	// Only 1P is supported
-	if (port > 0) return joypad;
 
 	while (SDL_PollEvent(&event))
 	{

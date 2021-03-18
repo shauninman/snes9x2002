@@ -7,7 +7,7 @@
 
 #include "sound_output.h"
 
-#define UNDERRUN_THRESHOLD 0.5
+#define UNDERRUN_THRESHOLD 0.75
 
 static int32_t BUFFSIZE;
 static uint8_t *buffer;
@@ -63,7 +63,7 @@ uint32_t Audio_Init()
 {
 	SDL_AudioSpec aspec, obtained;
 
-	BUFFSIZE = (SOUND_SAMPLES_SIZE * 2 * 2) * 4;
+	BUFFSIZE = (SOUND_SAMPLES_SIZE * 2 * 2) * 8;
 	buffer = (uint8_t *) malloc(BUFFSIZE);
 
 	/* Add some silence to the buffer */
