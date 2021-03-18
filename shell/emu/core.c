@@ -357,6 +357,8 @@ int main(int argc, char* argv[])
 			break;
 			case 1:
 				if (mmenu) {
+					SRAM_Menu(0);
+					
 					ShowMenu_t ShowMenu = (ShowMenu_t)dlsym(mmenu, "ShowMenu");
 					MenuReturnStatus status = ShowMenu(rom_path, save_path, sdl_screen, kMenuEventKeyDown);
 

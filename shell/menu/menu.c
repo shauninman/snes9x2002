@@ -39,7 +39,8 @@ static const int8_t upscalers_available = 2
 #endif
 ;
 
-void SaveState_PathTemplate(char* tmp, int size) {
+void SaveState_PathTemplate(char* tmp, int size)
+{
 	snprintf(tmp, size, "%s/%s_%%i.sts", save_path, GameName_emu);
 }
 void SaveState_Menu(uint_fast8_t load_mode, uint_fast8_t slot)
@@ -49,7 +50,7 @@ void SaveState_Menu(uint_fast8_t load_mode, uint_fast8_t slot)
 	SaveState(tmp,load_mode);
 }
 
-static void SRAM_Menu(uint_fast8_t load_mode)
+void SRAM_Menu(uint_fast8_t load_mode)
 {
 	char tmp[512];
 	snprintf(tmp, sizeof(tmp), "%s/%s.srm", sram_path, GameName_emu);

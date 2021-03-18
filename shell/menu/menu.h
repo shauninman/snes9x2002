@@ -17,5 +17,6 @@ extern void Init_Configuration(void);
 
 extern void SaveState_Menu(uint_fast8_t load_mode, uint_fast8_t slot);
 extern void SaveState_PathTemplate(char* tmp, int size);
+extern void SRAM_Menu(uint_fast8_t load_mode);
 
 #endif
