@@ -15,6 +15,8 @@
 #include "config.h"
 #include "menu.h"
 #include "buttons.h"
+#include "snes9x.h"
+#include "cpuexec.h"
 
 t_config option;
 uint32_t emulator_state = 0;
@@ -33,20 +35,20 @@ extern void SRAM_Save(char* path, uint_fast8_t state);
 
 static uint8_t selectpressed = 0;
 static uint8_t save_slot = 0;
-static const int8_t upscalers_available = 2
+static const int8_t upscalers_available = 4
 #ifdef SCALE2X_UPSCALER
 +1
 #endif
 ;
 
-static void SaveState_Menu(uint_fast8_t load_mode, uint_fast8_t slot)
+void SaveState_Menu(uint_fast8_t load_mode, uint_fast8_t slot)
 {
 	char tmp[512];
 	snprintf(tmp, sizeof(tmp), "%s/%s_%d.sts", save_path, GameName_emu, slot);
 	SaveState(tmp,load_mode);
 }
 
-static void SRAM_Menu(uint_fast8_t load_mode)
+void SRAM_Menu(uint_fast8_t load_mode)
 {
 	char tmp[512];
 	snprintf(tmp, sizeof(tmp), "%s/%s.srm", sram_path, GameName_emu);
@@ -85,8 +87,10 @@ static void config_load()
 		option.config_buttons[0][10] = BTN_START;
 		option.config_buttons[0][11] = BTN_SELECT;
 
-		option.fullscreen = 0;
+		option.fullscreen = 3;
+		option.showfps = 0;
 	}
+	if (option.showfps == 0) Settings.DisplayFrameRate = false; else Settings.DisplayFrameRate = true;
 }
 
 static void config_save()
@@ -346,7 +350,7 @@ void Menu()
 	/* Save sram settings each time we bring up the menu */
 	SRAM_Menu(0);
 	
-    while (((currentselection != 1) && (currentselection != 6)) || (!pressed))
+    while (((currentselection != 1) && (currentselection != 7) && (currentselection != 8)) || (!pressed))
     {
         pressed = 0;
 
@@ -354,34 +358,39 @@ void Menu()
 
 		print_string("snes9x2002 - Built on " __DATE__, TextWhite, 0, 5, 15, backbuffer->pixels);
 
-		if (currentselection == 1) print_string("Continue", TextRed, 0, 5, 45, backbuffer->pixels);
-		else  print_string("Continue", TextWhite, 0, 5, 45, backbuffer->pixels);
+#define		MENU_Y(y)	29 + (18*y)
+
+		if (currentselection == 1) print_string("Continue", TextRed, 0, 5, MENU_Y(1), backbuffer->pixels);
+		else  print_string("Continue", TextWhite, 0, 5, MENU_Y(1), backbuffer->pixels);
 
 		snprintf(text, sizeof(text), "Load State %d", save_slot);
 
-		if (currentselection == 2) print_string(text, TextRed, 0, 5, 65, backbuffer->pixels);
-		else print_string(text, TextWhite, 0, 5, 65, backbuffer->pixels);
+		if (currentselection == 2) print_string(text, TextRed, 0, 5, MENU_Y(2), backbuffer->pixels);
+		else print_string(text, TextWhite, 0, 5, MENU_Y(2), backbuffer->pixels);
 
 		snprintf(text, sizeof(text), "Save State %d", save_slot);
 
-		if (currentselection == 3) print_string(text, TextRed, 0, 5, 85, backbuffer->pixels);
-		else print_string(text, TextWhite, 0, 5, 85, backbuffer->pixels);
+		if (currentselection == 3) print_string(text, TextRed, 0, 5, MENU_Y(3), backbuffer->pixels);
+		else print_string(text, TextWhite, 0, 5, MENU_Y(3), backbuffer->pixels);
 
         if (currentselection == 4)
         {
 			switch(option.fullscreen)
 			{
 				case 0:
-					print_string("Scaling : Native", TextRed, 0, 5, 105, backbuffer->pixels);
+					print_string("Scaling : Native", TextRed, 0, 5, MENU_Y(4), backbuffer->pixels);
 				break;
 				case 1:
-					print_string("Scaling : Stretched", TextRed, 0, 5, 105, backbuffer->pixels);
+					print_string("Scaling : FS Sharp", TextRed, 0, 5, MENU_Y(4), backbuffer->pixels);
 				break;
 				case 2:
-					print_string("Scaling : Bilinear", TextRed, 0, 5, 105, backbuffer->pixels);
+					print_string("Scaling : FS Smooth", TextRed, 0, 5, MENU_Y(4), backbuffer->pixels);
 				break;
 				case 3:
-					print_string("Scaling : EPX/Scale2x", TextRed, 0, 5, 105, backbuffer->pixels);
+					print_string("Scaling : Bilinear", TextRed, 0, 5, MENU_Y(4), backbuffer->pixels);
+				break;
+				case 4:
+					print_string("Scaling : Overscan", TextRed, 0, 5, MENU_Y(4), backbuffer->pixels);
 				break;
 			}
         }
@@ -390,25 +399,36 @@ void Menu()
 			switch(option.fullscreen)
 			{
 				case 0:
-					print_string("Scaling : Native", TextWhite, 0, 5, 105, backbuffer->pixels);
+					print_string("Scaling : Native", TextWhite, 0, 5, MENU_Y(4), backbuffer->pixels);
 				break;
 				case 1:
-					print_string("Scaling : Stretched", TextWhite, 0, 5, 105, backbuffer->pixels);
+					print_string("Scaling : FS Sharp", TextWhite, 0, 5, MENU_Y(4), backbuffer->pixels);
 				break;
 				case 2:
-					print_string("Scaling : Bilinear", TextWhite, 0, 5, 105, backbuffer->pixels);
+					print_string("Scaling : FS Smooth", TextWhite, 0, 5, MENU_Y(4), backbuffer->pixels);
 				break;
 				case 3:
-					print_string("Scaling : EPX/Scale2x", TextWhite, 0, 5, 105, backbuffer->pixels);
+					print_string("Scaling : Bilinear", TextWhite, 0, 5, MENU_Y(4), backbuffer->pixels);
+				break;
+				case 4:
+					print_string("Scaling : Overscan", TextWhite, 0, 5, MENU_Y(4), backbuffer->pixels);
 				break;
 			}
         }
 
-		if (currentselection == 5) print_string("Input remapping", TextRed, 0, 5, 125, backbuffer->pixels);
-		else print_string("Input remapping", TextWhite, 0, 5, 125, backbuffer->pixels);
+		if (option.showfps == 0) snprintf(text, sizeof(text), "Show FPS : OFF");
+		else snprintf(text, sizeof(text), "Show FPS : ON");
+		if (currentselection == 5) print_string(text, TextRed, 0, 5, MENU_Y(5), backbuffer->pixels);
+		else print_string(text, TextWhite, 0, 5, MENU_Y(5), backbuffer->pixels);
 
-		if (currentselection == 6) print_string("Quit", TextRed, 0, 5, 145, backbuffer->pixels);
-		else print_string("Quit", TextWhite, 0, 5, 145, backbuffer->pixels);
+		if (currentselection == 6) print_string("Input remapping", TextRed, 0, 5, MENU_Y(6), backbuffer->pixels);
+		else print_string("Input remapping", TextWhite, 0, 5, MENU_Y(6), backbuffer->pixels);
+
+		if (currentselection == 7) print_string("Reset", TextRed, 0, 5, MENU_Y(7), backbuffer->pixels);
+		else print_string("Reset", TextWhite, 0, 5, MENU_Y(7), backbuffer->pixels);
+
+		if (currentselection == 8) print_string("Quit", TextRed, 0, 5, MENU_Y(8), backbuffer->pixels);
+		else print_string("Quit", TextWhite, 0, 5, MENU_Y(8), backbuffer->pixels);
 
 		print_string("Frontend by gameblabla", TextWhite, 0, 5, 205, backbuffer->pixels);
 		print_string("Credits: Snes9x dev team, libretro", TextWhite, 0, 5, 225, backbuffer->pixels);
@@ -422,19 +442,19 @@ void Menu()
                     case BTN_UP:
                         currentselection--;
                         if (currentselection == 0)
-                            currentselection = 6;
+                            currentselection = 8;
                         break;
                     case BTN_DOWN:
                         currentselection++;
-                        if (currentselection == 7)
+                        if (currentselection == 9)
                             currentselection = 1;
                         break;
                     case BTN_L2:
                     case BTN_SELECT:
                     case BTN_B:
-						pressed = 1;
-						currentselection = 1;
-						break;
+			pressed = 1;
+			currentselection = 1;
+			break;
                     case BTN_A:
                     case BTN_START:
                         pressed = 1;
@@ -444,13 +464,16 @@ void Menu()
                         {
                             case 2:
                             case 3:
-                                if (save_slot > 0) save_slot--;
-							break;
+				if (save_slot > 0) save_slot--;
+				break;
                             case 4:
-							option.fullscreen--;
-							if (option.fullscreen < 0)
-								option.fullscreen = upscalers_available;
-							break;
+				option.fullscreen--;
+				if (option.fullscreen < 0)
+					option.fullscreen = upscalers_available;
+				break;
+                            case 5:
+				option.showfps ^= 1;
+				break;
                         }
                         break;
                     case BTN_RIGHT:
@@ -458,15 +481,16 @@ void Menu()
                         {
                             case 2:
                             case 3:
-                                save_slot++;
-								if (save_slot == 10)
-									save_slot = 9;
-							break;
+				if (save_slot < 9) save_slot++;
+				break;
                             case 4:
-                                option.fullscreen++;
-                                if (option.fullscreen > upscalers_available)
-                                    option.fullscreen = 0;
-							break;
+				option.fullscreen++;
+				if (option.fullscreen > upscalers_available)
+					option.fullscreen = 0;
+				break;
+                            case 5:
+				option.showfps ^= 1;
+				break;
                         }
                         break;
 					default:
@@ -475,7 +499,7 @@ void Menu()
             }
             else if (Event.type == SDL_QUIT)
             {
-				currentselection = 6;
+				currentselection = 8;
 				pressed = 1;
 			}
         }
@@ -484,20 +508,26 @@ void Menu()
         {
             switch(currentselection)
             {
-				case 5:
+				case 7:
+					S9xReset();
+				break;
+				case 6:
 					Input_Remapping();
 				break;
-                case 4 :
-                    option.fullscreen++;
-                    if (option.fullscreen > upscalers_available)
-                        option.fullscreen = 0;
-                    break;
-                case 2 :
-                    SaveState_Menu(1, save_slot);
-					currentselection = 1;
-                    break;
-                case 3 :
+				case 5:
+					option.showfps ^= 1;
+				break;
+				case 4 :
+					option.fullscreen++;
+					if (option.fullscreen > upscalers_available)
+					option.fullscreen = 0;
+				break;
+				case 3 :
 					SaveState_Menu(0, save_slot);
+					currentselection = 1;
+				break;
+				case 2 :
+					SaveState_Menu(1, save_slot);
 					currentselection = 1;
 				break;
 				default:
@@ -515,13 +545,11 @@ void Menu()
     SDL_Flip(sdl_screen);
     #endif
 
-    if (currentselection == 6)
-    {
-        exit_snes = 1;
-	}
+    if (currentselection == 8)	exit_snes = 1;
 
 	/* Switch back to emulator core */
 	config_save();
+	if (option.showfps == 0) Settings.DisplayFrameRate = false; else Settings.DisplayFrameRate = true;
 	emulator_state = 0;
 	Set_Video_InGame();
 }

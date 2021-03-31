@@ -123,7 +123,7 @@ static const uint32_t TblSkip[4][4] = {
 #endif
 
 #ifdef AUDIO_FRAMESKIP
-#define MAX_SKIP_COUNT 3
+#define MAX_SKIP_COUNT 4
 static uint32_t SkipCnt = 0;
 #endif
 

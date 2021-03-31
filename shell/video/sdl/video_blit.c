@@ -86,23 +86,30 @@ void Update_Video_Ingame(int width, int height)
 	uint16_t *s, *d;
 	uint32_t h, w;
 	uint8_t PAL = !!(Memory.FillRAM[0x2133] & 4);
+	if (height == SNES_HEIGHT_EXTENDED) height++;	// 239 to 240
 
 	SDL_LockSurface(sdl_screen);
 
 	switch(option.fullscreen)
 	{
-	  case 0:
+	  case 0:	// Native
 		  s = (uint16_t*) GFX.Screen;
 		  d = (uint16_t*) sdl_screen->pixels + ((sdl_screen->w - width)/2 + (sdl_screen->h - height) * 160) - (PAL ? 0 : 2*320);
 		  for(uint8_t y = 0; y < height; y++, s += GFX_PITCH / 2, d += sdl_screen->w) memmove(d, s, width * 2);
 		  break;
-	  case 1:
-	  	upscale_256xXXX_to_320x240((uint32_t*) sdl_screen->pixels, (uint32_t*) GFX.Screen, GFX_PITCH / 2, PAL ? 240 : 224);
+	  case 1:	// FS Sharp
+	  	upscale_256xXXX_to_320x240((uint32_t*) sdl_screen->pixels, (uint32_t*) GFX.Screen, GFX_PITCH / 2, height, height);
 	  	break;
-	  case 2:
+	  case 2:	// FS Smooth
+	  	upscale_256xXXX_to_320x240((uint32_t*) sdl_screen->pixels, (uint32_t*) GFX.Screen, GFX_PITCH / 2, height, 240/2);
+	  	break;
+	  case 3:	// Bilinear
 	  	if (height == 240) upscale_256x240_to_320x240_bilinearish((uint32_t*) sdl_screen->pixels, (uint32_t*) GFX.Screen, GFX_PITCH / 2, 239);
 	  	else upscale_256x240_to_320x240_bilinearish((uint32_t*) sdl_screen->pixels + (160*8), (uint32_t*) GFX.Screen, GFX_PITCH / 2, 224);
 	  	break;
+	  case 4:	// Overscan
+		  upscale_240x208_to_320x240((uint16_t*) sdl_screen->pixels, (uint16_t*) GFX.Screen);
+		  break;
 	}
 	//bitmap_scale(0, 0, IPPU.RenderedScreenWidth, IPPU.RenderedScreenHeight, sdl_screen->w, sdl_screen->h, SNES_WIDTH*2, 0, GFX.Screen, sdl_screen->pixels);
 
