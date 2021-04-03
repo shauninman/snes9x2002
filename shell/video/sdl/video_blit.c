@@ -108,7 +108,8 @@ void Update_Video_Ingame(int width, int height)
 	  	else upscale_256x240_to_320x240_bilinearish((uint32_t*) sdl_screen->pixels + (160*8), (uint32_t*) GFX.Screen, GFX_PITCH / 2, 224);
 	  	break;
 	  case 4:	// Overscan
-		  upscale_240x208_to_320x240((uint16_t*) sdl_screen->pixels, (uint16_t*) GFX.Screen);
+		  if (height == 240) upscale_240x208_to_320x240((uint16_t*) sdl_screen->pixels, (uint16_t*) GFX.Screen + (GFX_PITCH * 4));
+		  else upscale_240x208_to_320x240((uint16_t*) sdl_screen->pixels, (uint16_t*) GFX.Screen);
 		  break;
 	}
 	//bitmap_scale(0, 0, IPPU.RenderedScreenWidth, IPPU.RenderedScreenHeight, sdl_screen->w, sdl_screen->h, SNES_WIDTH*2, 0, GFX.Screen, sdl_screen->pixels);
