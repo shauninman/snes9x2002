@@ -22,21 +22,24 @@ SDL_LIBS := $(shell $(SYSROOT)/usr/bin/sdl-config --libs)
 CFLAGS	= -DLSB_FIRST -DFAST_ALIGNED_LSB_WORD_ACCESS -I. -Ilibretro/libretro-common/include -Isrc -DRIGHTSHIFT_IS_SAR
 CFLAGS	+= -I./shell/emu -I./shell/scalers -I./shell/emu -I./shell/audio -I./shell/menu -I./shell/video/sdl -I./shell/input -Ishell/headers
 
-CFLAGS	+= -Ofast -fsingle-precision-constant -fno-PIC -flto
+CFLAGS	+= -Ofast -fsingle-precision-constant -fno-PIC
+#CFLAGS  += -flto
 ifndef PROFILE
 CFLAGS	+= -falign-functions=1 -falign-jumps=1 -falign-loops=1 -falign-labels=1
 endif
 CFLAGS	+= -mcpu=arm926ej-s -mtune=arm926ej-s
 CFLAGS	+= -DNDEBUG -DAUDIO_FRAMESKIP -DGIT_VERSION=\"$(GIT_VERSION)\" -DTRIMUI -fno-builtin -fno-exceptions -ffunction-sections -std=gnu99
-CFLAGS	+= -Wall -Wextra -pedantic -Wno-implicit-function-declaration -Wno-implicit-fallthrough -Wno-sign-compare -Wno-unused-variable -Wno-unused-function -Wno-uninitialized -Wno-strict-aliasing -Wno-overflow -fno-strict-overflow
+CFLAGS	+= -Wall -Wextra -pedantic -Wno-implicit-function-declaration -Wno-sign-compare -Wno-unused-variable -Wno-unused-function -Wno-uninitialized -Wno-strict-aliasing -Wno-overflow -fno-strict-overflow
+#CFLAGS	+= -Wno-implicit-fallthrough
 
 ifeq ($(PROFILE), YES)
-CFLAGS	+= -fprofile-generate=./profile
+CFLAGS	+= -fprofile-generate=/mnt/SDCARD/profile/snes9x2002
 else ifeq ($(PROFILE), APPLY)
 CFLAGS	+= -fprofile-use -fprofile-dir=./profile -fbranch-probabilities
 endif
 
-LDFLAGS = -lc -lgcc -lm $(SDL_LIBS) -no-pie -Wl,--gc-sections -s -flto
+LDFLAGS = -lc -lgcc -lm $(SDL_LIBS) -Wl,--gc-sections -s
+#LDFLAGS += -flto
 LDFLAGS += -lSDL_image -lSDL_ttf -ldl
 ifeq ($(SOUND_BACKEND), portaudio)
 LDFLAGS	+= -lasound -lportaudio

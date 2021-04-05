@@ -2534,11 +2534,19 @@ void DisplayChar(uint8* Screen, uint8 c)
    }
 }
 
+#ifdef TRIMUI
+#include "config.h"
+#endif
 void S9xDisplayFrameRate()
 {
 	char string[16];
    uint8 *Screen = GFX.Screen;
-
+#ifdef TRIMUI
+	if (option.fullscreen == 4) {			// for Overscan
+		Screen += GFX_PITCH * 8 +16;
+		if (IPPU.RenderedScreenHeight == SNES_HEIGHT_EXTENDED) Screen += GFX_PITCH * 8;
+	}
+#endif
 	sprintf(string, "%02d/%02d", IPPU.DisplayedRenderedFrameCount, (int)Memory.ROMFramesPerSecond);
 
 	for (int i = 0; i < 5; i++) {
