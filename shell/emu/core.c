@@ -37,6 +37,7 @@
 static void* mmenu = NULL;
 static char rom_path[512];
 static char save_path[512];
+static int resume_slot = -1;
 
 char GameName_emu[512];
 
@@ -346,10 +347,19 @@ int main(int argc, char* argv[])
 	mmenu = dlopen("libmmenu.so", RTLD_LAZY);
 	strcpy(rom_path, argv[1]);
 	SaveState_PathTemplate(save_path, 512);
+	if (mmenu) {
+		ResumeSlot_t ResumeSlot = (ResumeSlot_t)dlsym(mmenu, "ResumeSlot");
+		if (ResumeSlot) resume_slot = ResumeSlot();
+	}
 	
     // get the game ready
     while (!exit_snes)
     {
+		if (resume_slot!=-1) {
+			SaveState_Menu(1, resume_slot);
+			resume_slot = -1;
+		}
+		
 		switch(emulator_state)
 		{
 			case 0:
