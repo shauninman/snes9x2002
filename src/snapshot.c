@@ -432,6 +432,7 @@ bool8 S9xFreezeGame(const char* filename)
    {
       Freeze();
       statef_close();
+	  sync();
       return (TRUE);
    }
    return (FALSE);
